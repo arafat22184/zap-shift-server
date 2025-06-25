@@ -68,11 +68,7 @@ async function run() {
         const query = { _id: new ObjectId(id) };
         const result = await parcelCollection.deleteOne(query);
 
-        if (result.deletedCount === 0) {
-          return res.status(404).send({ message: "Parcel not found" });
-        }
-
-        res.status(200).send({ message: "Parcel deleted successfully" });
+        res.send(result);
       } catch (error) {
         res
           .status(500)
