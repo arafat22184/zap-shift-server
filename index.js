@@ -25,16 +25,23 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
-    // await client.connect();
-
     const db = client.db("parcelDB");
     const parcelCollection = db.collection("parcels");
 
-    // All Parcels
+    // Get: All parcels or parcels by user (created_by), sorted by latest
     app.get("parcels", async (req, res) => {
-      const parcels = await parcelCollection.find().toArray();
-      res.send(parcels);
+      try {
+        const userEmail = req.query.email;
+
+        const query = userEmail ? { created_by: userEmail } : {};
+        const options = {
+          sort: { createdAt: -1 }, // Newest first
+        };
+        const parcels = await parcelCollection.find(query, options).toArray();
+        res.send(parcels);
+      } catch (error) {
+        res.status(500).send({ message: "Failed to get parcels" });
+      }
     });
 
     // Post Parcel
